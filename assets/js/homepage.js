@@ -1,10 +1,11 @@
 // Variables to store user input
-var userFormEl = document.querySelector("#user-form");
-var nameInputEl = document.querySelector("#username");
+const userFormEl = document.querySelector("#user-form");
+const nameInputEl = document.querySelector("#username");
+const languageButtonsEl = document.querySelector("#language-buttons");
 
 // Variables for displaying repos on website
-var repoContainerEl = document.querySelector("#repos-container");
-var repoSearchTerm = document.querySelector("#repo-search-term");
+const repoContainerEl = document.querySelector("#repos-container");
+const repoSearchTerm = document.querySelector("#repo-search-term");
 
 var getUserRepos = function(user) {
       // format the github api url
@@ -95,5 +96,27 @@ var displayRepos = function(repos, searchTerm) {
   }
 };
 
+async function getFeaturedRepos (language) {
+  try {
+    let apiUrl = "https://api.github.com/search/repositories?q=" + language + "+is:featured&sort=help-wanted-issues";
+    let unformattedAPIResponse = await fetch(apiUrl);
+    let apiResponse = await unformattedAPIResponse.json();
+    return displayRepos(apiResponse.items, language);
+  } catch (err){
+    alert("Error: " + apiResponse.statusText);
+  }
+};
+
+function buttonClickHandler(event){
+  let buttonClicked = event.target.getAttribute("data-language");
+  if (buttonClicked) {
+    getFeaturedRepos(buttonClicked);
+
+    // clear old content
+    repoContainerEl.textContent = "";
+  }
+}
+
 // Adds submit event listener to run the function
 userFormEl.addEventListener("submit", formSubmitHandler);
+languageButtonsEl.addEventListener("click", buttonClickHandler);
